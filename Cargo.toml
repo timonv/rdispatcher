@@ -1,4 +1,10 @@
 [package]
 name = "rdispatcher"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Timon Vonk <timonv@gmail.com>"]
+description = "Dispatcher for Rust, broadcast and subscribe many to many"
+homepage = "http://www.github.com/timonv/rdispatcher"
+repository = "http://www.github.com/timonv/rdispatcher"
+readme = "README.md"
+keywords = [events,dispatcher]
+license = "MIT License"
