@@ -5,7 +5,6 @@ use std::fmt::Debug;
 use std::clone::Clone;
 
 // Aliases for easier refactoring
-
 pub type SubscribeHandle<T> = mpsc::Sender<DispatchMessage<T>>;
 pub type BroadcastHandle<T> = mpsc::Receiver<DispatchMessage<T>>;
 
@@ -17,13 +16,11 @@ pub struct DispatchMessage<T> where T: Debug + Send + Clone {
 }
 
 pub struct Dispatcher<T> where T: Debug + Send + Clone {
-    // I heard you like types
     subscribers: HashMap<String, Vec<SubscribeHandle<T>>>,
     broadcasters: Vec<Arc<Mutex<BroadcastHandle<T>>>>
 }
 
 pub trait Broadcast<T: Debug> {
-   // fn broadcast(&self, dispatch_type: DispatchType, payload: String);
    fn broadcast_handle(&mut self) -> BroadcastHandle<T>;
 }
 
@@ -58,7 +55,7 @@ impl <T: 'static + Debug + Send + Clone>Dispatcher<T> {
     }
 
     pub fn start(&self) {
-       // Assuming that broadcasters.clone() copies the vector, but increase ref count on els
+       // Assuming that broadcasters.clone() copies the vector, but increase ref count on children
        for broadcaster in self.broadcasters.clone() {
           let subscribers = self.subscribers.clone();
           thread::spawn(move || {
@@ -93,19 +90,12 @@ impl <T: 'static + Debug + Send + Clone>Dispatcher<T> {
 // Convert to hashable for dispatchtype?
 fn type_to_string<T: Debug>(dispatch_type: &T) -> String {
    format!("{:?}", dispatch_type)
-   // match *dispatch_type {
-   //     OutgoingMessage => "OutgoingMessage",
-   //     ChangeCurrentChannel => "ChangeCurrentChannel",
-   //     RawIncomingMessage => "RawIncomingMessage",
-   //     UserInput => "UserInput"
-   // }
 }
 
 #[cfg(test)]
 mod test {
     use std::sync::mpsc;
     use self::DispatchType::{OutgoingMessage, RawIncomingMessage};
-    // use super::{Dispatcher, SubscribeHandle, BroadcastHandle, DispatchMessage};
     use super::*;
 
     #[derive(PartialEq, Debug, Clone)]
