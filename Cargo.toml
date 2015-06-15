@@ -6,5 +6,5 @@ description = "Dispatcher for Rust, broadcast and subscribe many to many"
 homepage = "http://www.github.com/timonv/rdispatcher"
 repository = "http://www.github.com/timonv/rdispatcher"
 readme = "README.md"
-keywords = [events,dispatcher]
+keywords = ["events","dispatcher"]
 license = "MIT License"
