@@ -6,8 +6,8 @@ use std::clone::Clone;
 
 // Aliases for easier refactoring
 
-pub type SubscribeHandle<T: Debug> = mpsc::Sender<DispatchMessage<T>>;
-pub type BroadcastHandle<T: Debug> = mpsc::Receiver<DispatchMessage<T>>;
+pub type SubscribeHandle<T> = mpsc::Sender<DispatchMessage<T>>;
+pub type BroadcastHandle<T> = mpsc::Receiver<DispatchMessage<T>>;
 
 
 #[derive(Clone)]
