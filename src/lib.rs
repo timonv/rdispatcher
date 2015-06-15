@@ -76,10 +76,12 @@ impl <T: 'static + Debug + Send + Clone>Dispatcher<T> {
        }
     }
 
+    #[allow(dead_code)]
     fn num_broadcasters(&self) -> usize {
        self.broadcasters.len()
     }
 
+    #[allow(dead_code)]
     fn num_subscribers(&self, dispatch_type: T) -> usize {
        match self.subscribers.get(&type_to_string(&dispatch_type)) {
           Some(subscribers) => subscribers.len(),
@@ -195,7 +197,7 @@ mod test {
       fn broadcast(&self, dispatch_type: DispatchType, payload: String) {
          let message = DispatchMessage { dispatch_type: dispatch_type, payload: payload };
          match self.sender {
-            Some(ref s) => { s.send(message); },
+            Some(ref s) => { s.send(message).unwrap(); },
             None => ()
          };
       }
