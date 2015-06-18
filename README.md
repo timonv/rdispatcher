@@ -12,7 +12,7 @@ you to setup, and the messages themselves are strings.
 Add to your `Cargo.toml`
 
 ```
-rdispatcher = *
+rdispatcher = "*"
 ```
 
 And run `cargo install`
