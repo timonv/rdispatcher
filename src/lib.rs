@@ -1,34 +1,35 @@
+#![feature(hash_default)]
+
 use std::collections::HashMap;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
-use std::fmt::Debug;
+use std::hash::{hash, Hash, SipHasher};
 use std::clone::Clone;
 
 // Aliases for easier refactoring
 pub type SubscribeHandle<T> = mpsc::Sender<DispatchMessage<T>>;
 pub type BroadcastHandle<T> = mpsc::Receiver<DispatchMessage<T>>;
 
-
 #[derive(Clone)]
-pub struct DispatchMessage<T> where T: Debug + Send + Clone {
+pub struct DispatchMessage<T> where T: Hash + Send + Clone {
    pub dispatch_type: T,
    pub payload: String
 }
 
-pub struct Dispatcher<T> where T: Debug + Send + Clone {
+pub struct Dispatcher<T> where T: Hash + Send + Clone {
     subscribers: HashMap<String, Vec<SubscribeHandle<T>>>,
     broadcasters: Vec<Arc<Mutex<BroadcastHandle<T>>>>
 }
 
-pub trait Broadcast<T: Debug> {
+pub trait Broadcast<T: Hash> {
    fn broadcast_handle(&mut self) -> BroadcastHandle<T>;
 }
 
-pub trait Subscribe<T: Debug> {
+pub trait Subscribe<T: Hash> {
    fn subscribe_handle(&self) -> SubscribeHandle<T>;
 }
 
-impl <T: 'static + Debug + Send + Clone>Dispatcher<T> {
+impl <T: 'static + Hash + Send + Clone>Dispatcher<T> {
     pub fn new() -> Dispatcher<T> {
         Dispatcher { subscribers: HashMap::new(), broadcasters: vec![] }
     }
@@ -88,20 +89,22 @@ impl <T: 'static + Debug + Send + Clone>Dispatcher<T> {
 }
 
 // Convert to hashable for dispatchtype?
-fn type_to_string<T: Debug>(dispatch_type: &T) -> String {
-   format!("{:?}", dispatch_type)
+fn type_to_string<T: Hash>(dispatch_type: &T) -> String {
+   hash::<_, SipHasher>(&dispatch_type).to_string()
 }
 
 #[cfg(test)]
 mod test {
     use std::sync::mpsc;
-    use self::DispatchType::{OutgoingMessage, RawIncomingMessage};
+    use self::DispatchType::*;
     use super::*;
+    use std::hash::Hash;
 
-    #[derive(PartialEq, Debug, Clone)]
+    #[derive(PartialEq, Clone, Hash, Debug)]
     pub enum DispatchType {
         OutgoingMessage,
-        RawIncomingMessage
+        RawIncomingMessage,
+        SomethingComplex(String)
     }
 
     fn setup_dispatcher() -> Dispatcher<DispatchType> {
@@ -174,6 +177,25 @@ mod test {
         assert_eq!(message.dispatch_type, RawIncomingMessage);
         assert_eq!(message.payload, "Hello world!");
     }
+
+    // #[test]
+    // TODO Test is pending, this features needs to be implemented
+    // or the problem avoided
+    //
+    // fn test_broadcast_simple_message_with_complex_enum() {
+    //     let mut dispatcher = setup_dispatcher();
+    //     let sub = TestSubscriber::new();
+    //     let mut brd = TestBroadcaster::new();
+    //     dispatcher.register_broadcaster(&mut brd);
+    //     dispatcher.register_subscriber(&sub, SomethingComplex(String::new()));
+
+    //     dispatcher.start();
+
+    //     brd.broadcast(SomethingComplex("abc".to_string()), "Hello world!".to_string());
+    //     let message = sub.receiver.recv().unwrap();
+    //     assert_eq!(message.dispatch_type, SomethingComplex("abc".to_string()));
+    //     assert_eq!(message.payload, "Hello world!");
+    // }
 
     struct TestBroadcaster {
        sender: Option<SubscribeHandle<DispatchType>>
