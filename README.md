@@ -40,6 +40,8 @@ For several full examples, checkout the tests in lib.rs
 
 # Caveats
 
-* Currently the DispatchType (I prefer using an enum for it) is cast to a string
+* ~~Currently the DispatchType (I prefer using an enum for it) is cast to a string
 using Debug. This is legacy and should just use Hash. If you have a custom Debug
-for your your enum, you might get unexpected results.
+for your your enum, you might get unexpected results.~~ Resolved
+* Complex enums (i.e. SomethingComplex(String)) currently do not work as the dispatch
+type and will yield weird results.
