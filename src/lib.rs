@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
-use std::hash::{hash, Hash, SipHasher};
+use std::hash::{Hash, SipHasher, Hasher};
 use std::clone::Clone;
 
 // Aliases for easier refactoring
@@ -89,8 +89,10 @@ impl <T: 'static + Hash + Send + Clone>Dispatcher<T> {
 }
 
 // Convert to hashable for dispatchtype?
-fn type_to_string<T: Hash>(dispatch_type: &T) -> String {
-   hash::<_, SipHasher>(&dispatch_type).to_string()
+fn type_to_string<T: Hash>(t: &T) -> String {
+   let mut s = SipHasher::new();
+   t.hash(&mut s);
+   s.finish().to_string()
 }
 
 #[cfg(test)]
