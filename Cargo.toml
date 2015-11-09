@@ -1,6 +1,6 @@
 [package]
 name = "rdispatcher"
-version = "0.0.5"
+version = "0.1.0"
 authors = ["Timon Vonk <timonv@gmail.com>"]
 description = "Dispatcher for Rust, broadcast and subscribe many to many"
 homepage = "http://www.github.com/timonv/rdispatcher"
