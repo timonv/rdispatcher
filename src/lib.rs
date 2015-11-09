@@ -1,5 +1,3 @@
-#![feature(hash_default)]
-
 use std::collections::HashMap;
 use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
@@ -21,11 +19,11 @@ pub struct Dispatcher<T> where T: Hash + Send + Clone {
     broadcasters: Vec<Arc<Mutex<BroadcastHandle<T>>>>
 }
 
-pub trait Broadcast<T: Hash> {
+pub trait Broadcast<T: Hash + Send + Clone> {
    fn broadcast_handle(&mut self) -> BroadcastHandle<T>;
 }
 
-pub trait Subscribe<T: Hash> {
+pub trait Subscribe<T: Hash + Send + Clone> {
    fn subscribe_handle(&self) -> SubscribeHandle<T>;
 }
 
@@ -100,13 +98,11 @@ mod test {
     use std::sync::mpsc;
     use self::DispatchType::*;
     use super::*;
-    use std::hash::Hash;
 
     #[derive(PartialEq, Clone, Hash, Debug)]
     pub enum DispatchType {
         OutgoingMessage,
-        RawIncomingMessage,
-        SomethingComplex(String)
+        RawIncomingMessage
     }
 
     fn setup_dispatcher() -> Dispatcher<DispatchType> {
